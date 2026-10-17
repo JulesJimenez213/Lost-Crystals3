@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Lost Crystal</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="game">
+
+    <!-- ===== GAME TITLE (top of the screen) ===== -->
+    <header class="title-bar">
+      <h1>The Lost Crystal</h1>
+      <p class="subtitle">A tiny forest adventure</p>
+    </header>
+
+    <!-- ===== GAME SCREEN: the canvas plus the start / victory screens on top of it ===== -->
+    <div class="stage">
+      <canvas id="gameCanvas" width="960" height="600"
+              aria-label="The Lost Crystal game screen"></canvas>
+
+      <!-- Start screen -->
+      <div class="overlay" id="startScreen">
+        <div class="card">
+          <h2>The Lost Crystal</h2>
+          <p>Collect every crystal in each forest, survive the ambushes, and face the alien boss!</p>
+          <label class="difficulty-label" for="difficultySelect">Choose Difficulty</label>
+          <select id="difficultySelect" class="difficulty-select">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+            <option value="insane">Insane</option>
+          </select>
+          <p id="difficultyDescription" class="difficulty-description">Balanced enemies and a fair challenge.</p>
+          <div class="menu-actions">
+            <button id="playBtn" class="pixel-btn">Play</button>
+            <button id="customizeBtn" class="pixel-btn menu-btn">Customize Character</button>
+            <button id="settingsBtn" class="pixel-btn menu-btn">Settings</button>
+          </div>
+          <div id="customizePanel" class="subpanel hidden">
+            <h3>Customize Character</h3>
+            <div class="custom-grid">
+              <label>Character <select id="charGender"><option value="male">Male</option><option value="female">Female</option></select></label>
+              <label>Hair <select id="charHair"><option value="brown">Brown</option><option value="black">Black</option><option value="blonde">Blonde</option><option value="red">Red</option><option value="blue">Mystic Blue</option></select></label>
+              <label>Skin tone <select id="charSkin"><option value="#f2c6a0">Light</option><option value="#d99a6c">Tan</option><option value="#a9653d">Brown</option><option value="#70432e">Deep</option></select></label>
+              <label>Clothes <select id="charClothes"><option value="#3977d5">Royal Blue</option><option value="#2f9b62">Forest Green</option><option value="#9b3fc1">Mage Purple</option><option value="#c94a4a">Crimson</option><option value="#e2b83f">Gold</option></select></label>
+              <label>Accessory <select id="charAccessory"><option value="none">None</option><option value="wings">Wings</option><option value="crown">Crown</option><option value="halo">Halo</option><option value="eyepatch">Eyepatch</option></select></label>
+            </div>
+            <p class="small">Your look appears on your character in the forest.</p>
+            <button id="customizeDoneBtn" class="pixel-btn small-btn">Done</button>
+          </div>
+          <div id="settingsPanel" class="subpanel hidden">
+            <h3>Settings</h3>
+            <label class="setting-row">Audio volume <input id="audioVolume" type="range" min="0" max="100" value="70"></label>
+            <label class="setting-row">Sound effects volume <input id="sfxVolume" type="range" min="0" max="100" value="80"></label>
+            <label class="setting-row"><input id="sfxEnabled" type="checkbox" checked> Enable sound effects</label>
+            <button id="settingsBackBtn" class="pixel-btn small-btn">Back to Main Menu</button>
+          </div>
+          <p class="small">Move: <kbd>W A S D</kbd> / arrows &nbsp; Attack: <kbd>Space</kbd> &nbsp; Interact: <kbd>E</kbd></p>
+        </div>
+      </div>
+
+      <!-- In-game settings overlay -->
+      <div class="overlay hidden" id="gameSettingsScreen">
+        <div class="card">
+          <h2>Settings</h2>
+          <label class="setting-row">Audio volume <input id="gameAudioVolume" type="range" min="0" max="100" value="70"></label>
+          <label class="setting-row">Sound effects volume <input id="gameSfxVolume" type="range" min="0" max="100" value="80"></label>
+          <label class="setting-row"><input id="gameSfxEnabled" type="checkbox" checked> Enable sound effects</label>
+          <div class="btn-row"><button id="resumeBtn" class="pixel-btn">Resume</button><button id="gameMenuBtn" class="pixel-btn menu-btn">Main Menu</button></div>
+        </div>
+      </div>
+
+      <!-- Victory screen (hidden until the player wins) -->
+      <div class="overlay victory-overlay hidden" id="winScreen">
+        <div class="card victory-card">
+          <h2 class="victory-title">&#9733; VICTORY! &#9733;</h2>
+          <p>You defeated Zorgon, the Alien Overlord,<br>
+             and brought every crystal home!<br>
+             Time: <strong id="finalTime">0:00</strong><br>
+             Monsters defeated: <strong id="finalKills">0</strong></p>
+          <div class="btn-row">
+            <button id="restartBtn" class="pixel-btn">Play Again</button>
+            <button id="menuBtn" class="pixel-btn menu-btn">Main Menu</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game over screen (hidden until the player runs out of health) -->
+      <div class="overlay hidden" id="loseScreen">
+        <div class="card">
+          <h2>You Were Defeated!</h2>
+          <p>The monsters got you this time.<br>
+             Try the level again with your gear.</p>
+          <button id="retryBtn" class="pixel-btn">Try Again</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== HUD: objective on the left, help panel on the right ===== -->
+    <section class="hud">
+      <div class="panel objective-panel">
+        <h2 id="levelText">Level 1: The Whispering Forest</h2>
+        <p id="objectiveText" class="objective">Find the Lost Crystal!</p>
+        <p id="messageText" class="message">Follow the winding path through the forest.</p>
+      </div>
+
+      <div class="panel help-panel">
+        <h2>Controls</h2>
+        <ul>
+          <li><kbd>W A S D</kbd> / <kbd>Arrows</kbd> Move</li>
+          <li><kbd>Space</kbd> Attack (also blocks enemy shots!)</li>
+          <li>Dodge the shots and the red circles!</li>
+          <li><kbd>E</kbd> Collect / interact</li>
+        </ul>
+        <button id="hudRestartBtn" class="pixel-btn small-btn">Restart</button> <button id="hudSettingsBtn" class="pixel-btn small-btn menu-btn">Settings</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

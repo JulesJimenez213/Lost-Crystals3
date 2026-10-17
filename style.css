@@ -1,0 +1,238 @@
+/* =========================================================
+   THE LOST CRYSTAL - style.css
+   Layout and retro "pixel" look for the page around the canvas.
+   ========================================================= */
+
+/* ---------- 1. Colour palette (CSS variables) ----------
+   Change a colour here and it updates everywhere. */
+:root {
+  --ink:        #1b1b2f;  /* near-black used for borders and text */
+  --forest:     #123524;  /* page background */
+  --forest-2:   #0d2619;  /* darker stripe for the background pattern */
+  --leaf:       #5dbb4a;  /* light green */
+  --wood:       #8b5a2b;  /* brown panel borders */
+  --parchment:  #f3e3b8;  /* panel background */
+  --gold:       #ffd23f;  /* buttons and highlights */
+  --gold-dark:  #a8801a;  /* button shadow */
+  --crystal:    #3ec8ff;  /* crystal blue */
+
+  /* Retro-looking font stack. These fonts exist on almost every computer,
+     so the game works offline with no downloads. */
+  --pixel-font: "Lucida Console", "Courier New", Courier, monospace;
+}
+
+/* ---------- 2. Page basics ---------- */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--pixel-font);
+  color: var(--ink);
+  /* Simple diagonal stripes make a retro background without any image file */
+  background: repeating-linear-gradient(
+    45deg, var(--forest) 0 16px, var(--forest-2) 16px 32px);
+}
+
+/* The width is limited so the whole game (title + canvas + panels)
+   fits on one screen without scrolling. The canvas is 16:10. */
+.game {
+  width: max(320px, min(960px, calc((100vh - 200px) * 1.6)));
+  margin: 0 auto;
+  padding: 10px 0 14px;
+}
+
+/* ---------- 3. Title bar ---------- */
+.title-bar {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.title-bar h1 {
+  margin: 0;
+  font-size: clamp(1.4rem, 3.4vw, 2.2rem);
+  letter-spacing: 3px;
+  color: var(--gold);
+  /* Hard (blurless) shadow = classic pixel text */
+  text-shadow: 3px 3px 0 var(--ink), -1px -1px 0 var(--ink),
+               1px -1px 0 var(--ink), -1px 1px 0 var(--ink);
+}
+
+.subtitle {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: var(--leaf);
+}
+
+/* ---------- 4. The stage (canvas + overlays) ---------- */
+.stage {
+  position: relative;               /* lets the overlays sit on top of the canvas */
+  border: 6px solid var(--wood);
+  outline: 4px solid var(--ink);
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.45);
+  background: var(--ink);
+  line-height: 0;                   /* removes the gap under the canvas */
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Keep pixel art crisp when the canvas is scaled up or down */
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* ---------- 5. Overlays: start screen and victory screen ---------- */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(13, 38, 25, 0.82);
+  line-height: 1.4;
+}
+
+.hidden { display: none; }
+
+.card {
+  max-width: 80%;
+  padding: 22px 28px;
+  text-align: center;
+  background: var(--parchment);
+  border: 5px solid var(--ink);
+  box-shadow: 0 0 0 5px var(--wood), 8px 8px 0 5px rgba(0, 0, 0, 0.4);
+}
+
+.card h2 {
+  margin: 0 0 10px;
+  font-size: clamp(1.2rem, 3vw, 1.9rem);
+  letter-spacing: 2px;
+}
+
+.card p { margin: 0 0 16px; font-size: clamp(0.8rem, 1.6vw, 1rem); }
+.card .small { margin: 14px 0 0; font-size: 0.75rem; }
+
+/* ---------- 6. Buttons ---------- */
+.pixel-btn {
+  font-family: var(--pixel-font);
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 8px 26px;
+  color: var(--ink);
+  background: var(--gold);
+  border: 4px solid var(--ink);
+  box-shadow: 0 5px 0 var(--gold-dark);   /* looks like a raised key */
+  cursor: pointer;
+}
+
+.pixel-btn:hover { background: #ffe27a; }
+
+.pixel-btn:active {
+  transform: translateY(5px);              /* pressed down */
+  box-shadow: 0 0 0 var(--gold-dark);
+}
+
+.pixel-btn:focus-visible { outline: 4px solid var(--crystal); outline-offset: 3px; }
+
+.small-btn { font-size: 0.8rem; padding: 4px 14px; }
+
+/* ---------- 6b. Victory screen (shown after the boss is defeated) ---------- */
+.victory-overlay { background: rgba(10, 8, 30, 0.6); }   /* lighter, so you can see the fireworks behind it */
+
+.victory-title {
+  font-size: clamp(1.6rem, 5vw, 3rem) !important;
+  letter-spacing: 4px;
+  color: var(--gold);
+  /* hard outline = classic pixel text */
+  text-shadow: 4px 4px 0 var(--ink), -2px -2px 0 var(--ink),
+               2px -2px 0 var(--ink), -2px 2px 0 var(--ink);
+  animation: victory-pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes victory-pulse {
+  from { transform: scale(1); }
+  to   { transform: scale(1.08); }
+}
+
+.btn-row {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.menu-btn { background: var(--crystal); box-shadow: 0 5px 0 #1c7da3; }
+.menu-btn:hover { background: #8fe0ff; }
+.menu-btn:active { box-shadow: 0 0 0 #1c7da3; }
+
+/* ---------- 7. HUD panels under the game ---------- */
+.hud {
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+  align-items: stretch;
+}
+
+.panel {
+  padding: 8px 14px;
+  background: var(--parchment);
+  border: 4px solid var(--ink);
+  box-shadow: 0 0 0 4px var(--wood), 5px 5px 0 4px rgba(0, 0, 0, 0.35);
+}
+
+.panel h2 {
+  margin: 0 0 4px;
+  font-size: 0.8rem;
+  color: var(--wood);
+}
+
+.objective-panel { flex: 1 1 60%; }
+.help-panel      { flex: 1 1 40%; }
+
+.objective { margin: 0; font-size: clamp(1rem, 2.2vw, 1.4rem); font-weight: bold; }
+.message   { margin: 4px 0 0; font-size: 0.8rem; min-height: 1.2em; }
+
+.help-panel ul { margin: 0 0 6px; padding: 0; list-style: none; font-size: 0.78rem; }
+.help-panel li { margin-bottom: 3px; }
+
+/* Little keyboard-key look */
+kbd {
+  display: inline-block;
+  padding: 0 5px;
+  font-family: var(--pixel-font);
+  font-size: 0.85em;
+  background: #fff;
+  border: 2px solid var(--ink);
+  border-bottom-width: 4px;
+}
+
+/* ---------- 8. Small screens ---------- */
+@media (max-width: 640px) {
+  .hud { flex-direction: column; }
+  .card { padding: 14px 16px; }
+}
+
+
+/* Main-menu difficulty selector */
+.difficulty-label { display: block; margin: 8px 0 5px; font-weight: bold; color: var(--wood); }
+.difficulty-select { display: block; margin: 0 auto; min-width: 180px; padding: 8px 12px; font: bold 1rem var(--pixel-font); color: var(--ink); background: #fff8df; border: 3px solid var(--ink); }
+.difficulty-description { min-height: 1.3em; margin: 7px 0 12px !important; font-size: 0.75rem !important; }
+
+
+/* Menus, settings, and character customization */
+.menu-actions { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+.menu-actions .pixel-btn { font-size:.85rem; padding:8px 12px; }
+.subpanel { margin-top:12px; padding:12px; border:3px solid var(--wood); background:#e7d4a4; text-align:left; }
+.subpanel h3 { margin:0 0 10px; text-align:center; }
+.custom-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.custom-grid label, .setting-row { display:flex; flex-direction:column; gap:4px; font-size:.75rem; text-align:left; }
+.custom-grid select { width:100%; min-width:0; padding:5px; font-family:var(--pixel-font); border:2px solid var(--ink); background:#fff4d5; }
+.setting-row { margin:10px 0; }
+.setting-row input[type=range] { width:100%; accent-color:#247d4d; }
+.setting-row:has(input[type=checkbox]) { flex-direction:row; align-items:center; }
+#customizePanel .small { font-size:.7rem; margin:8px 0; }
+#gameSettingsScreen .card { max-width:90%; }
+#gameSettingsScreen .btn-row { gap:8px; }
+@media (max-width:600px) { .custom-grid { grid-template-columns:1fr; } .card { max-width:92%; padding:14px; } }
